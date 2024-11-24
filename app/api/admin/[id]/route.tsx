@@ -1,15 +1,16 @@
 import { connectDB } from "@/lib/config/dbConnect";
-import User from "@/app/models/Users";
 import { NextResponse } from "next/server";
+import AdminUser from "@/app/models/Admin-users";
+import asyncHandler from "express-async-handler";
 
 //get all users
 export async function GET() {
   await connectDB();
-  const users = await User.find({});
+  const users = await AdminUser.find({});
   return NextResponse.json(users);
 }
 
-//create user
+//create Admin-user
 
 export async function POST(request: Request) {
   await connectDB();
@@ -24,7 +25,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const findUser = await User.findOne({ $or: [{ username }, { email }] });
+    const findUser = await AdminUser.findOne({
+      $or: [{ username }, { email }],
+    });
     if (findUser) {
       return NextResponse.json(
         { error: "User already exists" },
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await User.create({ username, email, password });
+    const user = await AdminUser.create({ username, email, password });
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -43,25 +46,27 @@ export async function POST(request: Request) {
   }
 }
 
-//update user
-
-export async function PUT(request: Request) {
+// Update Admin-user
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   await connectDB();
 
   try {
-    const { id, username, email, password } = await request.json();
+    const { username, email, password } = await request.json();
 
-    // Validate data
-    if (!id || !username || !email || !password) {
+    // Validate required fields
+    if (!username || !email || !password) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
       );
     }
 
-    // Find and update user
-    const updatedUser = await User.findByIdAndUpdate(
-      id, // MongoDB will handle ObjectId conversion
+    // Find and update AdminUser by ID from the URL
+    const updatedUser = await AdminUser.findByIdAndUpdate(
+      params.id, // Extracted from the dynamic route
       { username, email, password },
       { new: true, runValidators: true }
     );
@@ -72,15 +77,14 @@ export async function PUT(request: Request) {
 
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error) {
-    console.error(error);
+    console.error("Error updating admin user:", error);
     return NextResponse.json(
       { error: "Failed to update user" },
       { status: 500 }
     );
   }
 }
-
-//delete user
+//delete Admin-user
 
 export async function DELETE(request: Request) {
   await connectDB();
@@ -93,7 +97,7 @@ export async function DELETE(request: Request) {
       );
     }
 
-    const deletedUser = await User.findOneAndDelete({ username });
+    const deletedUser = await AdminUser.findOneAndDelete({ username });
     if (!deletedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -106,3 +110,5 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+//Login AdminUser

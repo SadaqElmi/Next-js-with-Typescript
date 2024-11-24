@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import { Toaster } from "react-hot-toast";
+import AdminDashboard from "./admin-dashboard/pages";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -10,15 +11,23 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const isAdmin: boolean = false;
+
   return (
     <html lang="en">
       <body>
         <Toaster position="top-right" reverseOrder={false} />
-        <Navbar />
-        <div>{children}</div>
+        {isAdmin ? (
+          <AdminDashboard />
+        ) : (
+          <>
+            <Navbar />
+            <div>{children}</div>
+          </>
+        )}
       </body>
     </html>
   );

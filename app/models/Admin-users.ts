@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface User extends Document {
+export interface AdminUser extends Document {
   username: string;
   email: string;
   password: string;
@@ -8,7 +8,7 @@ export interface User extends Document {
   profileImage?: string; // Optional profile image URL
 }
 
-const userSchema: Schema = new mongoose.Schema({
+const adminuserSchema: Schema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -24,7 +24,7 @@ const userSchema: Schema = new mongoose.Schema({
   },
   role: {
     type: String,
-    default: "user",
+    default: "admin",
   },
   profileImage: {
     type: String,
@@ -32,6 +32,8 @@ const userSchema: Schema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.models.User || mongoose.model<User>("User", userSchema);
+const AdminUser =
+  mongoose.models.AdminUser ||
+  mongoose.model<AdminUser>("AdminUser", adminuserSchema);
 
-export default User;
+export default AdminUser;
